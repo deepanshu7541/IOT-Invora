@@ -21,8 +21,8 @@ const Profile = () => {
                 </AvatarFallback>
               </Avatar>
               <div className="text-center">
-                <h3 className="text-xl font-semibold text-foreground">Dr. Sarah Johnson</h3>
-                <p className="text-sm text-muted-foreground">Healthcare Administrator</p>
+                <h3 className="text-xl font-semibold text-foreground">Deepanshu Chand</h3>
+                <p className="text-sm text-muted-foreground">Nurse</p>
               </div>
               <Badge variant="secondary" className="bg-primary/10 text-primary">
                 <Shield className="mr-1 h-3 w-3" />
@@ -42,21 +42,21 @@ const Profile = () => {
                 <Mail className="h-5 w-5 text-primary" />
                 <div>
                   <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium text-foreground">sarah.johnson@medimonitor.com</p>
+                  <p className="font-medium text-foreground">deepanshu7541@gmail.com</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 rounded-lg border border-border p-4">
                 <Phone className="h-5 w-5 text-primary" />
                 <div>
                   <p className="text-sm text-muted-foreground">Phone</p>
-                  <p className="font-medium text-foreground">+1 234 567 8900</p>
+                  <p className="font-medium text-foreground">+1 437 696 7541</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 rounded-lg border border-border p-4">
                 <Building2 className="h-5 w-5 text-primary" />
                 <div>
                   <p className="text-sm text-muted-foreground">Department</p>
-                  <p className="font-medium text-foreground">Healthcare Administration</p>
+                  <p className="font-medium text-foreground">Neurologist</p>
                 </div>
               </div>
             </div>

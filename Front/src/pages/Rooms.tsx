@@ -90,10 +90,6 @@ const Rooms = () => {
       });
     }
   };
-
-  // ------------------------------------
-  // UI RETURN
-  // ------------------------------------
   return (
     <div className="space-y-8">
       <div>
@@ -104,9 +100,6 @@ const Rooms = () => {
       </div>
 
       <div className="space-y-6">
-        {/* ---------------------------------------------------- */}
-        {/* Available Rooms */}
-        {/* ---------------------------------------------------- */}
         <div>
           <h2 className="mb-4 text-xl font-semibold text-foreground">
             Available Rooms

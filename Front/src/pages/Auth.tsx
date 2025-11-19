@@ -86,8 +86,8 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Welcome to MediMonitor</CardTitle>
-          <CardDescription>Login or create an account to continue</CardDescription>
+          <CardTitle>Welcome to Invora</CardTitle>
+          <CardDescription>Login to continue</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
