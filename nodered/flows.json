@@ -20,13 +20,12 @@
         "once": true,
         "onceDelay": "1",
         "topic": "",
+        "payload": "",
         "payloadType": "date",
         "x": 180,
         "y": 140,
         "wires": [
-            [
-                "function-build-payload"
-            ]
+            ["function-build-payload"]
         ]
     },
     {
@@ -34,20 +33,12 @@
         "type": "function",
         "z": "flow-lumosense-1",
         "name": "Build Sensor Data Payload",
-        "func": "msg.method = \"POST\";\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\"\n};\n\nmsg.payload = {\n    sensorId: \"room-101-temp\",\n    ts: new Date().toISOString(),\n    tempC: 9.92,\n    humidity: 40,\n    sig: \"dev-sig\"\n};\n\nreturn msg;\n// // Generate simulated sensor data\n// const sensorId = \"room-101-temp\";\n// const now = new Date().toISOString();\n\n// // Simulated temperature between 2–12°C\n// const tempC = Number((2 + Math.random() * 10).toFixed(2));\n\n// // Random humidity 40–60\n// const humidity = Math.floor(40 + Math.random() * 20);\n\n// // Build payload for backend API\n// const payload = {\n//     sensorId,\n//     ts: now,\n//     tempC,\n//     humidity,\n//     sig: \"dev-sig\"  // placeholder signature\n// };\n\n// msg.payload = payload;\n// msg.headers = { \"Content-Type\": \"application/json\" };\n// return msg;",
+        "func": "msg.method = \"POST\";\n\nmsg.headers = {\"Content-Type\": \"application/json\"};\n\nmsg.payload = {\n    sensorId: \"room-101-temp\",\n    ts: new Date().toISOString(),\n    tempC: Number((2 + Math.random() * 10).toFixed(2)),\n    humidity: Math.floor(40 + Math.random() * 20),\n    sig: \"dev-sig\"\n};\n\nreturn msg;",
         "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
         "x": 440,
         "y": 140,
         "wires": [
-            [
-                "http-post-backend",
-                "debug-output"
-            ]
+            ["http-post-backend", "debug-output", "update-last-timestamp"]
         ]
     },
     {
@@ -59,20 +50,9 @@
         "ret": "obj",
         "paytoqs": "ignore",
         "url": "http://192.168.2.169:4000/api/sensors/reading",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "",
-        "senderr": false,
-        "headers": [],
         "x": 710,
         "y": 140,
-        "wires": [
-            [
-                "debug-backend-response"
-            ]
-        ]
+        "wires": [["debug-backend-response"]]
     },
     {
         "id": "debug-output",
@@ -80,14 +60,9 @@
         "z": "flow-lumosense-1",
         "name": "Show Payload Being Sent",
         "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
+        "toSidebar": true,
         "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 730,
+        "x": 750,
         "y": 200,
         "wires": []
     },
@@ -97,15 +72,72 @@
         "z": "flow-lumosense-1",
         "name": "Show Backend Response",
         "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
+        "toSidebar": true,
         "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
         "x": 950,
         "y": 140,
+        "wires": []
+    },
+    {
+        "id": "update-last-timestamp",
+        "type": "function",
+        "z": "flow-lumosense-1",
+        "name": "Update Last Timestamp",
+        "func": "flow.set(\"lastSeen\", Date.now());\nreturn msg;",
+        "x": 480,
+        "y": 260,
+        "wires": [[]]
+    },
+    {
+        "id": "watchdog-timer",
+        "type": "inject",
+        "z": "flow-lumosense-1",
+        "name": "Watchdog Every 10 Seconds",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "10",
+        "once": true,
+        "onceDelay": 2,
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 330,
+        "wires": [["watchdog-check"]]
+    },
+    {
+        "id": "watchdog-check",
+        "type": "function",
+        "z": "flow-lumosense-1",
+        "name": "Check Last Sensor Update",
+        "func": "const lastSeen = flow.get(\"lastSeen\") || 0;\nconst now = Date.now();\n\n// 10-second timeout window\nif (now - lastSeen > 10000) {\n    msg.payload = \"⚠ SENSOR DOWN: No data received in 10s\";\n    return [msg, null];   // output 1 = failure\n}\n\nmsg.payload = \"✓ Sensor OK\";\nreturn [null, msg];       // output 2 = success",
+        "outputs": 2,
+        "x": 460,
+        "y": 330,
+        "wires": [["debug-watchdog-failure"], ["debug-watchdog-success"]]
+    },
+    {
+        "id": "debug-watchdog-failure",
+        "type": "debug",
+        "z": "flow-lumosense-1",
+        "name": "Watchdog FAILURE",
+        "active": true,
+        "complete": "payload",
+        "x": 730,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "debug-watchdog-success",
+        "type": "debug",
+        "z": "flow-lumosense-1",
+        "name": "Watchdog OK",
+        "active": true,
+        "complete": "payload",
+        "x": 720,
+        "y": 360,
         "wires": []
     }
 ]

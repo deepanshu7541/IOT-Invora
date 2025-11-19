@@ -10,102 +10,139 @@
         "id": "inject-temp",
         "type": "inject",
         "z": "flow-lumosense-1",
-        "name": "Trigger Every 5 Seconds",
-        "props": [
-            {
-                "p": "payload"
-            }
-        ],
+        "name": "Simulate Reading Every 5s",
+        "props": [],
         "repeat": "5",
+        "crontab": "",
         "once": true,
-        "onceDelay": "1",
+        "onceDelay": "2",
         "topic": "",
-        "payloadType": "date",
-        "x": 180,
+        "x": 170,
         "y": 140,
-        "wires": [
-            [
-                "function-build-payload"
-            ]
-        ]
+        "wires": [["function-build-payload"]]
     },
     {
         "id": "function-build-payload",
         "type": "function",
         "z": "flow-lumosense-1",
-        "name": "Build Sensor Data Payload",
-        "func": "msg.method = \"POST\";\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\"\n};\n\nmsg.payload = {\n    sensorId: \"room-101-temp\",\n    ts: new Date().toISOString(),\n    tempC: 9.92,\n    humidity: 40,\n    sig: \"dev-sig\"\n};\n\nreturn msg;\n// // Generate simulated sensor data\n// const sensorId = \"room-101-temp\";\n// const now = new Date().toISOString();\n\n// // Simulated temperature between 2–12°C\n// const tempC = Number((2 + Math.random() * 10).toFixed(2));\n\n// // Random humidity 40–60\n// const humidity = Math.floor(40 + Math.random() * 20);\n\n// // Build payload for backend API\n// const payload = {\n//     sensorId,\n//     ts: now,\n//     tempC,\n//     humidity,\n//     sig: \"dev-sig\"  // placeholder signature\n// };\n\n// msg.payload = payload;\n// msg.headers = { \"Content-Type\": \"application/json\" };\n// return msg;",
+        "name": "Build Sensor Payload",
+        "func": "// Generate dynamic sensor values\nconst temp = Number((2 + Math.random() * 10).toFixed(2));\nconst humidity = Math.floor(40 + Math.random() * 20);\n\nmsg.payload = {\n    sensorId: \"room-101-temp\",\n    ts: new Date().toISOString(),\n    tempC: temp,\n    humidity: humidity,\n    sig: \"dev-sig\"\n};\n\nreturn msg;",
         "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 440,
+        "x": 410,
         "y": 140,
-        "wires": [
-            [
-                "http-post-backend",
-                "debug-output"
-            ]
-        ]
+        "wires": [["debug-sent", "http-post-backend", "watchdog-reset"]]
     },
     {
         "id": "http-post-backend",
         "type": "http request",
         "z": "flow-lumosense-1",
-        "name": "POST to Backend",
+        "name": "POST → Backend",
         "method": "POST",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "http://192.168.2.169/api/sensors/reading",
+        "url": "http://192.168.2.169:4000/api/sensors/reading",
         "tls": "",
         "persist": false,
         "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "",
-        "senderr": false,
-        "headers": [],
-        "x": 710,
+        "senderr": true,
+        "x": 670,
         "y": 140,
-        "wires": [
-            [
-                "debug-backend-response"
-            ]
-        ]
+        "wires": [["debug-backend"]]
     },
     {
-        "id": "debug-output",
+        "id": "debug-sent",
         "type": "debug",
         "z": "flow-lumosense-1",
-        "name": "Show Payload Being Sent",
+        "name": "Payload Sent",
         "active": true,
         "tosidebar": true,
-        "console": false,
-        "tostatus": false,
         "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 730,
+        "x": 700,
         "y": 200,
         "wires": []
     },
     {
-        "id": "debug-backend-response",
+        "id": "debug-backend",
         "type": "debug",
         "z": "flow-lumosense-1",
-        "name": "Show Backend Response",
+        "name": "Backend Response",
         "active": true,
         "tosidebar": true,
-        "console": false,
-        "tostatus": false,
         "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 950,
+        "x": 900,
         "y": 140,
+        "wires": []
+    },
+    {
+        "id": "wd-timer",
+        "type": "trigger",
+        "z": "flow-lumosense-1",
+        "name": "10s Watchdog Timer",
+        "op1": "",
+        "op2": "TIMEOUT",
+        "op1type": "nul",
+        "op2type": "str",
+        "duration": "10",
+        "extend": true,
+        "x": 420,
+        "y": 300,
+        "wires": [["wd-check"]]
+    },
+    {
+        "id": "watchdog-reset",
+        "type": "change",
+        "z": "flow-lumosense-1",
+        "name": "Reset Watchdog",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "RESET",
+                "tot": "str"
+            }
+        ],
+        "x": 200,
+        "y": 300,
+        "wires": [["wd-timer"]]
+    },
+    {
+        "id": "wd-check",
+        "type": "switch",
+        "z": "flow-lumosense-1",
+        "name": "Did Watchdog Timeout?",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {"t": "eq", "v": "TIMEOUT", "vt": "str"}
+        ],
+        "checkall": "true",
+        "repair": false,
+        "x": 630,
+        "y": 300,
+        "wires": [["wd-alert"]]
+    },
+    {
+        "id": "wd-alert",
+        "type": "function",
+        "z": "flow-lumosense-1",
+        "name": "Build Sensor-Down Alert",
+        "func": "msg.payload = {\n   sensorId: \"room-101-temp\",\n   alert: \"Sensor Down — No Data for 10s\",\n   ts: new Date().toISOString()\n};\nreturn msg;",
+        "outputs": 1,
+        "x": 880,
+        "y": 300,
+        "wires": [["debug-wd"]]
+    },
+    {
+        "id": "debug-wd",
+        "type": "debug",
+        "z": "flow-lumosense-1",
+        "name": "WATCHDOG ALERT!",
+        "active": true,
+        "tosidebar": true,
+        "complete": "payload",
+        "x": 1120,
+        "y": 300,
         "wires": []
     }
 ]

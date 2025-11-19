@@ -90,10 +90,10 @@ const OrganRoom = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Organ Storage Room</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl font-bold text-foreground">Organ Storage</h1>
+        {/* <p className="text-muted-foreground">
           Monitor organ inventory, age, temperature, and criticality status
-        </p>
+        </p> */}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

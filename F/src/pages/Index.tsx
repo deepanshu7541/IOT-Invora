@@ -15,8 +15,8 @@ const Index = () => {
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Dashboard Overview</h1>
-          <p className="text-muted-foreground">Complete healthcare facility monitoring and management system</p>
+          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+          {/* <p className="text-muted-foreground"></p> */}
         </div>
         
         {/* Manual Override Control */}

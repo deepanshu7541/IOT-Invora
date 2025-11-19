@@ -97,7 +97,7 @@ const Hospitals = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Hospitals</h1>
-        <p className="text-muted-foreground">Manage and monitor all hospital facilities</p>
+        {/* <p className="text-muted-foreground">Manage and monitor all hospital facilities</p> */}
       </div>
 
       <div className="grid gap-4">

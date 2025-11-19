@@ -188,10 +188,10 @@ const OrganRoom = () => {
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Organ Storage Room</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold text-foreground">Organ Storage</h1>
+          {/* <p className="text-muted-foreground">
             Monitor organ inventory, age, temperature, and criticality status
-          </p>
+          </p> */}
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
